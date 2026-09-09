@@ -1,0 +1,19 @@
+name: Manter Supabase ativo
+
+on:
+  schedule:
+    # Roda a cada 5 dias às 08:00 UTC — o Supabase pausa projetos gratuitos
+    # depois de 7 dias sem nenhuma atividade, então isso mantém o projeto acordado.
+    - cron: "0 8 */5 * *"
+  workflow_dispatch: {} # permite rodar manualmente pela aba "Actions" no GitHub
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fazer uma requisição simples ao banco
+        run: |
+          curl -s -o /dev/null -w "Resposta do Supabase: %{http_code}\n" \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/obras?select=id&limit=1" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
